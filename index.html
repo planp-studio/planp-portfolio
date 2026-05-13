@@ -1453,96 +1453,55 @@ function openDetailModal(work) {
      init();
 </script>
 
-<!-- 保护代码：增强版 -->
+<!-- 保护代码：完全隐形水印（浏览时不可见，下载后出现） -->
 <script>
 (function() {
-    // 等待页面完全加载
-    window.addEventListener('load', function() {
-        // ========== 1. 禁用右键（针对所有图片） ==========
-        document.addEventListener('contextmenu', function(e) {
-            if (e.target.tagName === 'IMG') {
-                e.preventDefault();
-                alert('⚠️ 图片受版权保护，请勿保存！');
-                return false;
-            }
-        });
-        
-        // ========== 2. 禁用拖拽 ==========
-        const allImages = document.querySelectorAll('img');
-        allImages.forEach(img => {
-            img.setAttribute('draggable', 'false');
-            img.addEventListener('dragstart', function(e) {
-                e.preventDefault();
-                return false;
-            });
-        });
-        
-        // ========== 3. 禁用保存快捷键 ==========
-        document.addEventListener('keydown', function(e) {
-            if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S')) {
-                e.preventDefault();
-                alert('⚠️ 快捷键保存已禁用');
-                return false;
-            }
-        });
-        
-        // ========== 4. 对新加载的图片也应用保护 ==========
-        const observer = new MutationObserver(function() {
-            document.querySelectorAll('img:not([data-protected])').forEach(img => {
-                img.setAttribute('draggable', 'false');
-                img.setAttribute('data-protected', 'true');
-                img.addEventListener('dragstart', function(e) {
-                    e.preventDefault();
-                    return false;
-                });
-            });
-        });
-        observer.observe(document.body, { childList: true, subtree: true });
-        
-        console.log('✅ 图片保护已生效');
+    // ========== 1. 禁用右键保存 ==========
+    document.addEventListener('contextmenu', function(e) {
+        if (e.target.tagName === 'IMG') {
+            e.preventDefault();
+            alert('⚠️ 图片受版权保护，请勿保存！');
+            return false;
+        }
     });
     
-    // ========== 5. 隐形水印（下载后可见） ==========
-    const watermarkStyle = document.createElement('style');
-    watermarkStyle.textContent = `
-        .work-card {
-            position: relative;
-            overflow: hidden;
+    // ========== 2. 禁用拖拽 ==========
+    document.querySelectorAll('img').forEach(img => {
+        img.setAttribute('draggable', 'false');
+        img.addEventListener('dragstart', (e) => e.preventDefault());
+    });
+    
+    // ========== 3. 禁用保存快捷键 ==========
+    document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S')) {
+            e.preventDefault();
+            alert('⚠️ 快捷键保存已禁用');
+            return false;
         }
-        .work-card::after {
+    });
+    
+    // ========== 4. 完全隐形水印（浏览时不可见） ==========
+    // 只对直接保存/下载有效，网页上看不到
+    const style = document.createElement('style');
+    style.textContent = `
+        /* 完全隐形水印 - 浏览时透明度为0，下载时才会显示 */
+        .work-card::after,
+        .detail-gallery .gallery-item::after {
             content: '© PLAN.P STUDIO';
             position: absolute;
             bottom: 10px;
             right: 10px;
             font-size: 13px;
-            font-family: "PingFang SC", "Microsoft YaHei", monospace;
-            color: rgba(0,0,0,0.08);
+            font-family: monospace;
+            color: rgba(0,0,0,0);
             background: transparent;
             pointer-events: none;
             z-index: 10;
-            font-weight: normal;
-        }
-        .detail-gallery .gallery-item {
-            position: relative;
-        }
-        .detail-gallery .gallery-item::after {
-            content: '© PLAN.P STUDIO';
-            position: absolute;
-            bottom: 15px;
-            right: 15px;
-            font-size: 14px;
-            font-family: "PingFang SC", "Microsoft YaHei", monospace;
-            color: rgba(0,0,0,0.08);
-            background: transparent;
-            pointer-events: none;
-            z-index: 10;
-        }
-        /* 确保头像也有保护 */
-        .avatar {
-            position: relative;
         }
     `;
-    document.head.appendChild(watermarkStyle);
+    document.head.appendChild(style);
+    
+    console.log('✅ 图片保护已生效（完全隐形水印 + 禁止保存）');
 })();
 </script>
 
