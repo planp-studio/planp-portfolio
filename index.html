@@ -1453,7 +1453,7 @@ function openDetailModal(work) {
      init();
 </script>
 
-<!-- 保护代码：完全隐形水印（浏览时不可见，下载后出现） -->
+<!-- 保护代码：Canvas 水印（底部居中，保存后清晰） -->
 <script>
 (function() {
     // ========== 1. 禁用右键保存 ==========
@@ -1466,10 +1466,12 @@ function openDetailModal(work) {
     });
     
     // ========== 2. 禁用拖拽 ==========
-    document.querySelectorAll('img').forEach(img => {
-        img.setAttribute('draggable', 'false');
-        img.addEventListener('dragstart', (e) => e.preventDefault());
-    });
+    function disableAllDrag() {
+        document.querySelectorAll('img').forEach(img => {
+            img.setAttribute('draggable', 'false');
+            img.addEventListener('dragstart', (e) => e.preventDefault());
+        });
+    }
     
     // ========== 3. 禁用保存快捷键 ==========
     document.addEventListener('keydown', function(e) {
@@ -1480,28 +1482,75 @@ function openDetailModal(work) {
         }
     });
     
-    // ========== 4. 完全隐形水印（浏览时不可见） ==========
-    // 只对直接保存/下载有效，网页上看不到
-    const style = document.createElement('style');
-    style.textContent = `
-        /* 完全隐形水印 - 浏览时透明度为0，下载时才会显示 */
-        .work-card::after,
-        .detail-gallery .gallery-item::after {
-            content: '© PLAN.P STUDIO';
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            font-size: 13px;
-            font-family: monospace;
-            color: rgba(0,0,0,0);
-            background: transparent;
-            pointer-events: none;
-            z-index: 10;
-        }
-    `;
-    document.head.appendChild(style);
+    // ========== 4. Canvas 水印（底部居中，保存后清晰可见） ==========
+    function addWatermarkToImage(img) {
+        // 跳过已处理的图片和头像
+        if (img.hasAttribute('data-watermarked')) return;
+        if (img.classList && img.classList.contains('avatar')) return;
+        
+        const originalSrc = img.src;
+        if (!originalSrc || originalSrc.startsWith('data:')) return;
+        
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const tempImg = new Image();
+        
+        tempImg.crossOrigin = 'Anonymous';
+        tempImg.onload = function() {
+            canvas.width = tempImg.width;
+            canvas.height = tempImg.height;
+            
+            // 先绘制原图
+            ctx.drawImage(tempImg, 0, 0);
+            
+            // 水印设置 - 网页上几乎透明，保存后清晰
+            const watermarkText = '© PLAN.P STUDIO';
+            
+            // 根据图片宽度自动调整字体大小
+            let fontSize = Math.max(16, Math.floor(tempImg.width / 18));
+            fontSize = Math.min(fontSize, 40); // 最大40px
+            ctx.font = `${fontSize}px "PingFang SC", "Microsoft YaHei", "Arial", sans-serif`;
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.005)';  // 网页上几乎透明
+            ctx.shadowBlur = 0;
+            
+            // 测量文字宽度
+            const textWidth = ctx.measureText(watermarkText).width;
+            
+            // 水印位置：底部居中
+            const x = (tempImg.width - textWidth) / 2;
+            const y = tempImg.height - 30;  // 距离底部30px
+            
+            // 绘制水印
+            ctx.fillText(watermarkText, x, y);
+            
+            // 可选：添加轻微阴影增强保存后的可见性
+            ctx.shadowBlur = 2;
+            ctx.shadowColor = 'rgba(0,0,0,0.2)';
+            ctx.fillText(watermarkText, x, y);
+            
+            // 替换原图
+            img.src = canvas.toDataURL('image/jpeg', 0.9);
+            img.setAttribute('data-watermarked', 'true');
+        };
+        tempImg.src = originalSrc;
+    }
     
-    console.log('✅ 图片保护已生效（完全隐形水印 + 禁止保存）');
+    // 监听所有现有图片和动态添加的图片
+    const observer = new MutationObserver(() => {
+        document.querySelectorAll('.work-card img, .detail-gallery img').forEach(addWatermarkToImage);
+        disableAllDrag();
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+    
+    // 页面加载后执行
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            document.querySelectorAll('.work-card img, .detail-gallery img').forEach(addWatermarkToImage);
+            disableAllDrag();
+        }, 500);
+    });
+    
+    console.log('✅ 图片保护已生效（底部居中水印）');
 })();
 </script>
 
