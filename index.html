@@ -1,0 +1,1529 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>PLAN.P STUDIO | 阿P作品集</title>
+    <meta name="description" content="独立插画师、陶艺爱好者阿P的个人作品网站。">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #ffffff;
+            color: #1a1a1a;
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 24px; }
+        
+        /* 导航栏 */
+        .navbar { padding: 32px 0 28px; border-bottom: 1px solid #eaeaea; margin-bottom: 48px; }
+        .nav-wrapper { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+        .nav-links { display: flex; justify-content: center; gap: 2.5rem; list-style: none; }
+        .nav-links a { text-decoration: none; color: #2c2c2c; font-size: 0.9rem; cursor: pointer; }
+        .nav-links a:hover { color: #000; text-decoration: underline; }
+        
+        /* 搜索按钮 */
+        .search-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.2s;
+            color: #2c2c2c;
+            font-size: 1.2rem;
+        }
+        .search-btn:hover { color: #000; }
+        
+        /* 搜索弹窗 */
+        .search-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 120px;
+        }
+        .search-modal.active { display: flex; }
+        .search-modal-content {
+            width: 90%;
+            max-width: 650px;
+            border-radius: 4px;
+            padding: 50px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        .search-modal input {
+            width: 100%;
+            padding: 16px 18px;
+            font-size: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 40px;
+            outline: none;
+        }
+        .search-modal input:focus { border-color: #000; }
+        .search-results {
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .search-result-item {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+        .search-result-item:hover { background: #f5f5f5; }
+        
+        /* 统一关闭按钮样式 */
+        .close-btn {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: white;
+            border: none;
+            font-size: 1.0rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            z-index: 1001;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .close-btn:hover {
+            background: #f0f0f0;
+            transform: scale(1.05);
+        }
+        
+        /* Hero 区域 - 头像无边框 */
+        .hero { text-align: center; margin-bottom: 72px; }
+        .avatar { width: 144px; height: 144px; border-radius: 50%; object-fit: cover; margin: 0 auto 24px; display: block; }
+        .hero h1 { font-size: 1.6rem; font-weight: 500; margin-bottom: 12px; color: #000; }
+        .bio { max-width: 560px; margin: 0 auto; color: #4a4a4a; font-size: 0.95rem; }
+        
+        /* 分类按钮 - 去除所有下划横线 */
+        .category-nav { display: flex; justify-content: center; flex-wrap: wrap; gap: 0.75rem 2rem; margin-bottom: 56px; padding-bottom: 16px; border-bottom: 1px solid #ececec; }
+        .category-btn { 
+            background: none; 
+            border: none; 
+            font-size: 0.95rem; 
+            color: #5a5a5a; 
+            cursor: pointer; 
+            padding: 6px 0; 
+            text-decoration: none; 
+        }
+        .category-btn.active { 
+            color: #000; 
+            font-weight: 500;
+        }
+        .category-btn:hover {
+            color: #000;
+        }
+        
+        /* 作品网格 - 4列布局 */
+        .work-grid { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 30px; 
+            margin-bottom: 20px; 
+        }
+        @media (max-width: 1100px) { 
+            .work-grid { grid-template-columns: repeat(3, 1fr); gap: 28px; } 
+        }
+        @media (max-width: 800px) { 
+            .work-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; } 
+        }
+        @media (max-width: 500px) { 
+            .work-grid { grid-template-columns: 1fr; gap: 32px; } 
+        }
+        
+        .work-card { 
+            transition: transform 0.25s; 
+            cursor: pointer;
+            overflow: hidden;
+        }
+        .work-card:hover { 
+            transform: translateY(-5px); 
+        }
+        .work-card img { 
+            width: 100%; 
+            aspect-ratio: 1 / 1; 
+            object-fit: cover; 
+            border-radius: 4px;
+            background-color: #f8f8f8; 
+        }
+        .work-card h3 { margin: 14px 0 6px; font-size: 0.9rem; font-weight: 500; }
+        .work-card p { font-size: 0.75rem; color: #6b6b6b; line-height: 1.4; }
+        .work-card p {display: none;    /* 隐藏描述文字 */
+}
+        /* 关于页面 */
+        .about-page { max-width: 800px; margin: 0 auto 80px; padding: 0 20px; }
+        .about-header { text-align: center; margin-bottom: 40px; }
+        .about-header h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #000000;
+        }
+        .about-content { padding: 40px; margin-bottom: 32px; }
+        .about-text { font-size: 0.85rem; line-height: 2.0; color: #6b6b6b; letter-spacing: 0.3px; }
+        .about-text p { margin-bottom: 1.2em; }
+        .about-text strong { color: #1a1a1a; font-weight: 600; }
+        
+        /* 社交媒体区域 */
+        .contact {
+            text-align: center;
+            margin: 90px 0 48px;
+            padding-top: 32px;
+            border-top: 1px solid #eaeaea;
+        }
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin-bottom: 28px;
+        }
+        .social-icon {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #555;
+            gap: 8px;
+            transition: transform 0.25s ease, color 0.2s;
+        }
+        .social-icon:hover {
+            transform: translateY(-4px);
+        }
+        .social-icon .icon-bg {
+            width: 2.0rem;
+            height: 2.0rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #ecf80b;
+            border-radius: 50%;
+            transition: all 0.25s ease;
+        }
+        .social-icon img,
+        .social-icon svg,
+        .social-icon i {
+            display: none;
+}
+        .social-icon i {
+            font-size: 1.3rem;
+            line-height: 1;
+            text-align: center;
+        }
+        .social-icon:hover .icon-bg {
+            background-color: #e8e8e8;
+            transform: scale(1.02);
+        }
+        .social-icon span {
+            font-size: 0.7rem;
+            font-weight: 450;
+            letter-spacing: 0.3px;
+            color: #777;
+            transition: color 0.2s;
+        }
+        .social-icon:hover span {
+            color: #000;
+        }
+        
+        .email-section {
+            text-align: center;
+            margin-top: 8px;
+            font-size: 0.85rem;
+        }
+        .email-section a {
+            color: #888;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .email-section a:hover {
+            color: #333;
+        }
+        
+        /* 品牌色悬停效果 - 圆形背景变色 */
+.social-icon:nth-child(1):hover .icon-bg { background-color: #1769ff; }  /* Behance 蓝 */
+.social-icon:nth-child(2):hover .icon-bg { background-color: #ff2442; }  /* 小红书 红 */
+.social-icon:nth-child(3):hover .icon-bg { background-color: #07c160; }  /* 微信 绿 */
+.social-icon:nth-child(4):hover .icon-bg { background-color: #ffea00; }  /* 站酷 橙 */
+.social-icon:nth-child(5):hover .icon-bg { background-color: #ff6b00; }  /* 淘宝 橙红 */
+
+        
+        .footer { text-align: center; padding: 40px 0; font-size: 0.7rem; color: #777; border-top: 1px solid #eaeaea; }
+        .page-hidden { display: none; }
+        .empty-message { text-align: center; color: #888; padding: 48px; }
+        .fade-in { animation: fadeIn 0.35s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* ========= 详情弹窗 - 与搜索框样式一致 ========= */
+        .detail-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 2000;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 120px;
+            overflow-y: auto;
+        }
+        .detail-modal.active { display: flex; }
+        
+        .detail-modal-content {
+    background: white;
+    width: 90%;
+    max-width: 1000px;
+    border-radius: 0px;
+    padding: 160px;       
+    margin-bottom: 160px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+
+        }
+        
+        .detail-title {
+            font-size: 1.5rem;
+            font-weight: 480;
+            margin-bottom: 50px;
+            color: #1a1a1a;
+            letter-spacing: -0.3px;
+            line-height: 1.0;
+            text-align: center;    /* 标题居中 */
+        }
+        .detail-description {
+            font-size: 0.9rem;
+            line-height: 2.0;
+            color: #555555;
+            margin-bottom: 30px;
+            font-weight: 350;
+            text-align: center;
+        }
+        
+        .detail-gallery {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 35px;
+}
+.detail-gallery img {
+    width: 100%;
+    max-width: 600px;      /* 限制最大宽度 */
+    height: auto;
+    display: block;
+    margin: 0 auto;        /* 居中显示 */
+    background: #f5f5f5;
+}
+        
+        @media (max-width: 768px) {
+            .container { padding: 0 20px; }
+            .avatar { width: 120px; height: 120px; }
+            .hero h1 { font-size: 1.5rem; }
+            .social-icons { gap: 1.5rem; }
+            .social-icon .icon-bg { width: 2.2rem; height: 2.2rem; }
+            .social-icon img, .social-icon svg, .social-icon i { width: 1.1rem; height: 1.1rem; }
+            .social-icon i { font-size: 1.1rem; }
+            .social-icon span { font-size: 0.65rem; }
+            .nav-wrapper { flex-direction: column; }
+            .category-btn { font-size: 0.85rem; }
+            .detail-modal-content { padding: 24px; }
+            .detail-title { font-size: 1.5rem; }
+            .close-btn { top: 20px; right: 20px; width: 36px; height: 36px; font-size: 1.2rem; }
+        }
+    </style>
+    <!-- 在 </head> 之前添加 -->
+<script>
+    (function() {
+        // ========== 1. 禁止右键保存 ==========
+        document.addEventListener('contextmenu', function(e) {
+            if (e.target.tagName === 'IMG') {
+                e.preventDefault();
+                return false;
+            }
+        });
+        
+        // 禁止拖拽
+        document.querySelectorAll('img').forEach(img => {
+            img.setAttribute('draggable', 'false');
+            img.addEventListener('dragstart', (e) => e.preventDefault());
+        });
+        
+        // 禁止保存快捷键
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S')) {
+                e.preventDefault();
+                alert('图片保存功能已禁用');
+            }
+        });
+        
+        // ========== 2. 添加Canvas水印 ==========
+        function addWatermark() {
+            const images = document.querySelectorAll('.work-card img, .detail-gallery img');
+            
+            images.forEach(img => {
+                if (img.hasAttribute('data-watermarked')) return;
+                
+                const originalSrc = img.src;
+                if (!originalSrc || originalSrc.startsWith('data:')) return;
+                
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const tempImg = new Image();
+                
+                tempImg.crossOrigin = 'Anonymous';
+                tempImg.onload = function() {
+                    canvas.width = tempImg.width;
+                    canvas.height = tempImg.height;
+                    ctx.drawImage(tempImg, 0, 0);
+                    
+                    // 水印文字
+                    const fontSize = Math.max(14, Math.floor(tempImg.width / 25));
+                    ctx.font = `${fontSize}px "PingFang SC", "Microsoft YaHei"`;
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+                    ctx.shadowBlur = 3;
+                    ctx.shadowColor = 'rgba(0,0,0,0.5)';
+                    
+                    const text = '© PLAN.P STUDIO';
+                    const metrics = ctx.measureText(text);
+                    const x = tempImg.width - metrics.width - 15;
+                    const y = tempImg.height - 15;
+                    
+                    ctx.fillText(text, x, y);
+                    img.src = canvas.toDataURL('image/jpeg', 0.85);
+                    img.setAttribute('data-watermarked', 'true');
+                };
+                tempImg.src = originalSrc;
+            });
+        }
+        
+        // 监听图片加载完成
+        window.addEventListener('load', () => setTimeout(addWatermark, 500));
+        
+        // 监听详情弹窗打开
+        const observer = new MutationObserver(() => setTimeout(addWatermark, 200));
+        observer.observe(document.body, { childList: true, subtree: true });
+    })();
+</script>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="container">
+        <div class="nav-wrapper">
+            <ul class="nav-links">
+                <li><a data-nav="work">WORK</a></li>
+                <li><a data-nav="about">ABOUT</a></li>
+                <li><a data-nav="contact">CONTACT</a></li>
+            </ul>
+            <button class="search-btn" id="searchIconBtn">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    </div>
+</nav>
+
+<!-- 搜索弹窗 -->
+<div id="searchModal" class="search-modal">
+    <button class="close-btn" id="closeSearchBtn">✕</button>
+    <div class="search-modal-content">
+        <input type="text" id="searchInput" placeholder="搜索作品标题、描述..." autocomplete="off">
+        <div id="searchResults" class="search-results"></div>
+    </div>
+</div>
+
+<!-- 详情弹窗 - 与搜索框样式一致 -->
+<div id="detailModal" class="detail-modal">
+    <button class="close-btn" id="closeDetailBtn">✕</button>
+    <div id="detailModalContent" class="detail-modal-content"></div>
+</div>
+
+<!-- WORK 页面 -->
+<main id="workPage" class="page">
+    <div class="container">
+        <div class="hero">
+            <img class="avatar" src="https://raw.githubusercontent.com/planp-studio/my-pictures/main/avatars/%E9%98%BFP-PLANP-LOGO-03.png" alt="阿P头像" onerror="this.src='https://placehold.co/300x300?text=PLAN.P'">
+            <h1>阿P</h1>
+            <div class="bio"></div>
+        </div>
+
+        <div class="category-nav" id="categoryNav">
+            <button class="category-btn active" data-category="illustration">插画</button>
+            <button class="category-btn" data-category="comic">漫画</button>
+            <button class="category-btn" data-category="ceramic">陶瓷手作</button>
+             <button class="category-btn" data-category="merch">周边设计</button>
+            <button class="category-btn" data-category="other">其它</button>
+        </div>
+
+        <div id="workContainer" class="work-section"></div>
+
+        <!-- 社交媒体区域 -->
+        <div class="contact">
+         <div class="social-icons">
+    <!-- Behance -->
+    <a href="https://www.behance.net/805955207a723" target="_blank" rel="noopener noreferrer" class="social-icon">
+        <div class="icon-bg"><i class="fab fa-behance-square"></i></div>
+        <span>Behance</span>
+    </a>
+    
+    <!-- 小红书 -->
+    <a href="https://www.xiaohongshu.com/user/profile/5aad3d2611be100784137562" target="_blank" rel="noopener noreferrer" class="social-icon">
+        <div class="icon-bg"><i class="fab fa-weixin"></i></div>
+        <span>小红书</span>
+    </a>
+    
+    <!-- 微信公众号 -->
+    <a href="https://mp.weixin.qq.com/s/jnxRl6ejdS6fNbnHtG-3xA" target="_blank" rel="noopener noreferrer" class="social-icon">
+        <div class="icon-bg"><i class="fab fa-weixin"></i></div>
+        <span>微信公众号</span>
+    </a>
+    
+    <!-- 站酷 -->
+    <a href="https://www.zcool.com.cn/u/13674056" target="_blank" rel="noopener noreferrer" class="social-icon">
+        <div class="icon-bg"><i class="fas fa-palette"></i></div>
+        <span>站酷</span>
+    </a>
+    
+    <!-- 淘宝 -->
+    <a href="https://shop360422364.taobao.com/?spm=a21n57.shop_search.0.0.1d1f494bVTlFzI" target="_blank" rel="noopener noreferrer" class="social-icon">
+        <div class="icon-bg"><i class="fab fa-taobao"></i></div>
+        <span>淘宝</span>
+    </a>
+</div>
+            <div class="email-section">
+                <a href="mailto:planpstudio@163.com">planpstudio@163.com</a>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- ABOUT 页面 -->
+<div id="aboutPage" class="page page-hidden">
+    <div class="container">
+        <div class="about-page">
+            <div class="about-header">
+                <h2>ABOUT</h2>
+            </div>
+            <div class="about-content">
+                <div class="about-text">
+                    <p>大家好，我是阿P，独立插画师、陶艺创作者，现居深圳。</p>
+                    <p>我的创作常常从自然、城市角落和生活事物汲取灵感，作品在童趣与安静叙事之中游走。</p>
+                    <p><strong>合作品牌</strong><br>乐凯撒、腾讯、niko and...、自如、喜茶、上好佳、华润三九、yeedi、HFP等</p>
+                    <p><strong>合作杂志</strong><br>《Wired》杂志、《时尚COSMO》杂志、《BAND》杂志</p>
+                    <p><strong>合作商场</strong><br>深圳卓越中心、上海淮海TX、贵阳南国花锦购物中心</p>
+                    <p><strong>展览活动</strong><br>上海一起凡几市集举办《Healing for Self》插画个展<br>上海淮海TX《隔壁展间》插画联展<br>贵阳南国花锦购物中心插画个展/自如「空间·界限」主题展览</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="container">
+        <p>© 2026 阿P · PLAN.P STUDIO</p>
+    </div>
+</footer>
+
+<script>
+    // ========== 作品数据 ==========
+    const worksData = {
+        illustration: [
+            { 
+                id: "ill_1",
+                title: "夏 SUMMER", 
+                description: "",
+                img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/summer-series/%E7%BD%91%E7%AB%99%E4%B8%BB%E9%A1%B5-%E6%8F%92%E7%94%BB-1%E5%A4%8F%E5%A4%A9.png",
+                bgColor: "#f5f5f5",        // 浅灰色
+                category: "illustration",
+                detail: {
+                    fullDescription: "",
+                    gallery: [
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/summer-series/1.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/summer-series/2.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/summer-series/3.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/summer-series/4.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/summer-series/5.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/summer-series/6.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/summer-series/7.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/summer-series/8.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/summer-series/9.jpg",
+                    ]
+                }
+            },
+            { 
+                id: "ill_2",
+                title: "观 OBSERVE", 
+                description: "",
+                img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/observe-series/%E7%BD%91%E7%AB%99%E4%B8%BB%E9%A1%B5-%E6%8F%92%E7%94%BB-2%E8%A7%82.png",
+                bgColor: "#f5f5f5",        // 浅灰色
+                category: "illustration",
+                detail: {
+                    fullDescription: "",
+                    gallery: [
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/observe-series/1.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/observe-series/2.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/observe-series/3.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/observe-series/4.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/observe-series/5.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/observe-series/6.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/observe-series/7.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/observe-series/8.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/observe-series/9.jpg",
+                    ]
+                }
+            },
+            { 
+                id: "ill_3",
+                title: "圣诞节 CHRISTMAS", 
+                description: "个人创作 · 丙烯与拼贴质感，2025",
+                img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/christmas-series/%E7%BD%91%E7%AB%99%E4%B8%BB%E9%A1%B5-%E6%8F%92%E7%94%BB-3%E5%9C%A3%E8%AF%9E%E8%8A%82.png",
+                bgColor: "#f5f5f5",        // 浅灰色
+                category: "illustration",
+                detail: {
+                    fullDescription: "",
+                    gallery: [
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/christmas-series/1.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/refs/heads/main/222.webP",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/christmas-series/3.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/christmas-series/4.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/christmas-series/5.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/christmas-series/6.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/christmas-series/7.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/christmas-series/8.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/christmas-series/9.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/christmas-series/10.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/christmas-series/11.jpg",
+                    ]
+                }
+            },
+            { 
+                id: "ill_4",
+                title: "非自然状态 UNNATURAL", 
+                description: "水彩插画，2024",
+                img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/unatural-series/%E7%BD%91%E7%AB%99%E4%B8%BB%E9%A1%B5-%E6%8F%92%E7%94%BB-4%E9%9D%9E%E8%87%AA%E7%84%B6%E7%8A%B6%E6%80%81.png",
+                category: "illustration",
+                detail: {
+                    fullDescription: "",
+                    gallery: [
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/unatural-series/1.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/unatural-series/2.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/unatural-series/3.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/unatural-series/4.jpg",
+                    ]
+                }
+            },
+            { 
+                id: "ill_5",
+                title: "等待 WAITING", 
+                description: "水彩插画，2024",
+                img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/waiting-series/%E7%BD%91%E7%AB%99%E4%B8%BB%E9%A1%B5-%E6%8F%92%E7%94%BB-9%E7%AD%89%E5%BE%85.png",
+                category: "illustration",
+                bgColor: "#f5f5f5",        // 浅灰色
+                detail: {
+                    fullDescription: "",
+                    gallery: [
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/waiting-series/1.webp",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/waiting-series/2.webp",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/waiting-series/3.webp",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/waiting-series/4.webp",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/waiting-series/5.webp",
+                    ]
+                }
+            },
+            { 
+                id: "ill_6",
+                title: "404 NOT FOUND", 
+                description: "",
+                img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/404-series/%E4%B8%BB%E9%A1%B5-404.png",
+                category: "illustration",
+                bgColor: "#f5f5f5",        // 浅灰色
+                detail: {
+                    fullDescription: "",
+                    gallery: [
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/404-series/1.webp",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/404-series/2.webp",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/404-series/3.webp",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/404-series/4.webp",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/404-series/5.webp",
+                    ]
+                }
+            },
+            { 
+                id: "ill_7",
+                title: "游乐园 AMUSEMENT PARK", 
+                description: "水彩插画，2024",
+                img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/park-series/%E4%B8%BB%E9%A1%B5-%E6%B8%B8%E4%B9%90%E5%9B%AD.png",
+                category: "illustration",
+                bgColor: "#f5f5f5",        // 浅灰色
+                detail: {
+                    fullDescription: "",
+                    gallery: [
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/park-series/1.webp",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/park-series/2.webp",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/park-series/3.webp",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/park-series/4.webp",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/park-series/5.webp",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/park-series/6.webp",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/park-series/7.webp",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/park-series/8.webp",
+                    ]
+                }
+            },
+            { 
+                id: "ill_8",
+                title: "异想 IMAGINE", 
+                description: "水彩插画，2024",
+                img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/imagine-series/%E5%BC%82%E6%83%B3.png",
+                category: "illustration",
+                bgColor: "#f5f5f5",        // 浅灰色
+                detail: {
+                    fullDescription: "",
+                    gallery: [
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/imagine-series/1.webp",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/imagine-series/2.webp",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/imagine-series/3.webp",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/imagine-series/4.webp",
+                    ]
+                }
+            },
+                        { 
+                id: "ill_9",
+                title: "饮咗味 DRINK", 
+                description: "",
+                img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/drink-series/%E4%B8%BB%E9%A1%B5-%E9%A5%AE.png",
+                bgColor: "#ffffff",        // 白色
+                category: "illustration",
+                detail: {
+                    fullDescription: "",
+                    gallery: [
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/drink-series/1.webp",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/drink-series/2.webp",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/drink-series/3.webp",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/drink-series/4.webp",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/drink-series/5.webp",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/drink-series/6.webp",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/drink-series/7.webp",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/drink-series/8.webp",
+                    ]
+                }
+            },
+            { 
+                id: "ill_10",
+                title: "公园野餐 PICNIC", 
+                description: "水彩插画，2024",
+                img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/picnic-series/%E4%B8%BB%E9%A1%B5-%E9%87%8E%E9%A4%90.png",
+                bgColor: "#ffffff",        // 白色
+                category: "illustration",
+                detail: {
+                    fullDescription: "",
+                    gallery: [
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/picnic-series/2.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/picnic-series/3.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/picnic-series/4.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/picnic-series/5.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/picnic-series/6.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/picnic-series/7.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/picnic-series/8.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/picnic-series/9.jpg",
+                    ]
+                }
+            },
+            { 
+                id: "ill_11",
+                title: "弯曲 BDND", 
+                description: "",
+                img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/bend-series/%E4%B8%BB%E9%A1%B5-%E5%BC%AF%E6%9B%B2.png",
+                category: "illustration",
+                bgColor: "#ffffff",        // 白色
+                detail: {
+                    fullDescription: "",
+                    gallery: [
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/bend-series/1.webp",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/bend-series/2.webp",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/bend-series/3.webp",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/bend-series/4.webp",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/bend-series/5.webp",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/bend-series/6.webp",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/bend-series/7.webp",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/bend-series/8.webp",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/bend-series/8.webp",
+                    ]
+                }
+            },
+            { 
+                id: "ill_12",
+                title: "感知 FEELING", 
+                description: "",
+                img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/feeling-series/%E4%B8%BB%E9%A1%B5-%E6%84%9F%E7%9F%A5.png",
+                category: "illustration",
+                bgColor: "#ffffff",        // 白色
+                detail: {
+                    fullDescription: "",
+                    gallery: [
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/feeling-series/1.webp",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/feeling-series/2.webp",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/feeling-series/3.webp",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/feeling-series/4.webp",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/feeling-series/5.webp",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/feeling-series/6.webp",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/feeling-series/7.webp",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/feeling-series/8.webp",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/feeling-series/9.webp",
+                    ]
+                }
+            },
+            { 
+                id: "ill_13",
+                title: "月 MOON", 
+                description: "水彩插画，2024",
+                img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/moon-series/%E7%BD%91%E7%AB%99%E4%B8%BB%E9%A1%B5-%E6%8F%92%E7%94%BB-5%E6%9C%88.png",
+                bgColor: "#ffffff",        // 白色
+                category: "illustration",
+                detail: {
+                    fullDescription: "",
+                    gallery: [
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/moon-series/%E7%BD%91%E7%AB%99%E4%B8%BB%E9%A1%B5-%E6%8F%92%E7%94%BB-5%E6%9C%88.png",
+                    ]
+                }
+            },
+            { 
+                id: "ill_14",
+                title: "食 EAT", 
+                description: "水彩插画，2024",
+                img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/eat-series/%E7%BD%91%E7%AB%99%E4%B8%BB%E9%A1%B5-%E6%8F%92%E7%94%BB-6%E9%A3%9F.png",
+                bgColor: "#ffffff",        // 白色
+                category: "illustration",
+                detail: {
+                    fullDescription: "",
+                    gallery: [
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/eat-series/%E7%BD%91%E7%AB%99%E4%B8%BB%E9%A1%B5-%E6%8F%92%E7%94%BB-6%E9%A3%9F.png"
+                    ]
+                }
+            },
+            { 
+                id: "ill_15",
+                title: "烛 CANDLELIGHT", 
+                description: "水彩插画，2024",
+                img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/candlelight-series/%E7%BD%91%E7%AB%99%E4%B8%BB%E9%A1%B5-%E6%8F%92%E7%94%BB-7%E7%83%9B.png",
+                category: "illustration",
+                bgColor: "#ffffff",        // 白色
+                detail: {
+                    fullDescription: "",
+                    gallery: [
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/candlelight-series/%E7%BD%91%E7%AB%99%E4%B8%BB%E9%A1%B5-%E6%8F%92%E7%94%BB-7%E7%83%9B.png"
+                    ]
+                }
+            },
+            { 
+                id: "ill_16",
+                title: "蛾 MOTH", 
+                description: "水彩插画，2024",
+                img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/moth-series/%E7%BD%91%E7%AB%99%E4%B8%BB%E9%A1%B5-%E6%8F%92%E7%94%BB-8%E8%9B%BE.png",
+                category: "illustration",
+                bgColor: "#ffffff",        // 白色
+                detail: {
+                    fullDescription: "",
+                    gallery: [
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/illustrations/moth-series/%E7%BD%91%E7%AB%99%E4%B8%BB%E9%A1%B5-%E6%8F%92%E7%94%BB-8%E8%9B%BE.png"
+                    ]
+                }
+            },
+        ],
+        comic: [
+            { 
+                id: "comic_1",
+                title: "她在散步 She is taking a walk", 
+                description: "",
+                img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/she-series/%E4%B8%BB%E9%A1%B5-1%E5%A5%B9.png",
+                category: "comic",
+                detail: {
+                    fullDescription: "",
+                    gallery: [
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/she-series/1.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/she-series/2.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/she-series/3.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/she-series/4.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/she-series/5.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/she-series/6.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/she-series/7.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/she-series/8.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/she-series/9.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/she-series/10.jpg",
+
+                    ]
+                }
+            },
+             { 
+                id: "comic_2",
+                title: "下午茶 AFTERNOON TEA", 
+                description: "",
+                img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/tea-series/%E4%B8%BB%E9%A1%B5-2%E4%B8%8B%E5%8D%88%E8%8C%B6.png",
+                category: "comic",
+                detail: {
+                    fullDescription: "",
+                    gallery: [
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/tea-series/1.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/tea-series/2.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/tea-series/3.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/tea-series/4.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/tea-series/5.jpg",
+
+                    ]
+                }
+            },
+                { 
+                    id: "comic_3",
+                    title: "自然 NATURAL", 
+                    description: "",
+                    img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/natural-series/%E4%B8%BB%E9%A1%B5-3%E8%87%AA%E7%84%B6.png",
+                    category: "comic",
+                    detail: {
+                        fullDescription: "",
+                        gallery: [
+                            "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/natural-series/1.jpg",
+                            "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/natural-series/2.jpg",
+                            "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/natural-series/3.jpg",
+                            "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/natural-series/4.jpg",
+                        ]
+                    }
+                },
+                 { 
+                    id: "comic_4",
+                    title: "午睡之后 After a short nap", 
+                    description: "",
+                    img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/after-series/%E4%B8%BB%E9%A1%B5-4%E5%8D%88%E7%9D%A1%E4%B9%8B%E5%90%8E.png",
+                    category: "comic",
+                    detail: {
+                        fullDescription: "",
+                        gallery: [
+                            "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/after-series/1.jpg",
+                            "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/after-series/2.jpg",
+                            "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/after-series/3.jpg",
+                            "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/after-series/4.jpg",
+                            "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/after-series/5.jpg",
+                            "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/after-series/6.jpg",
+                            "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/after-series/7.jpg",
+                            "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/after-series/8.jpg",
+                        ]
+                    }
+                },
+                                 { 
+                    id: "comic_5",
+                    title: "窃窃私语 FURTIVE WHISPERS", 
+                    description: "",
+                    img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/whisper-series/%E4%B8%BB%E9%A1%B5-5%E7%AA%83%E7%AA%83%E7%A7%81%E8%AF%AD.png",
+                    category: "comic",
+                    detail: {
+                        fullDescription: "",
+                        gallery: [
+                            "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/whisper-series/1.jpg",
+                            "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/whisper-series/2.jpg",
+                            "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/whisper-series/3.jpg",
+                            "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/whisper-series/4.jpg",
+                            "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/whisper-series/5.jpg",
+    
+                        ]
+                    }
+                },
+                                 { 
+                    id: "comic_6",
+                    title: "谜 A Closed Book", 
+                    description: "",
+                    img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/book-series/%E4%B8%BB%E9%A1%B5-6%E8%B0%9C.png",
+                    category: "comic",
+                    detail: {
+                        fullDescription: "",
+                        gallery: [
+                            "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/book-series/1.webp",
+                            "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/book-series/2.webp",
+                            "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/book-series/3.webp",
+                            "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/book-series/4.webp",
+                            "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/book-series/5.webp",
+    
+                        ]
+                    }
+                },
+                                 { 
+                    id: "comic_7",
+                    title: "光明 PROMISING", 
+                    description: "",
+                    img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/promising-series/%E4%B8%BB%E9%A1%B5-7%E5%85%89%E6%98%8E.png",
+                    category: "comic",
+                    detail: {
+                        fullDescription: "",
+                        gallery: [
+                            "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/promising-series/1.jpg",
+                        ]
+                    }
+                },
+                                 { 
+                    id: "comic_8",
+                    title: "思绪 THOUGHT", 
+                    description: "",
+                    img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/thought-series/%E4%B8%BB%E9%A1%B5-8%E6%80%9D%E7%BB%AA.png",
+                    category: "comic",
+                    detail: {
+                        fullDescription: "",
+                        gallery: [
+                            "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/thought-series/1.jpg",
+                        ]
+                    }
+                },
+                                 { 
+                    id: "comic_9",
+                    title: "触 TACTILE", 
+                    description: "",
+                    img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/tactile-series/%E4%B8%BB%E9%A1%B5-9%E8%A7%A6.png",
+                    category: "comic",
+                    detail: {
+                        fullDescription: "",
+                        gallery: [
+                            "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/tactile-series/1.jpg",
+                        ]
+                    }
+                },
+                                 { 
+                    id: "comic_10",
+                    title: "圣诞节 CHRISTMAS", 
+                    description: "",
+                    img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/m-series/%E4%B8%BB%E9%A1%B5-10%E5%9C%A3%E8%AF%9E%E8%8A%82.png",
+                    category: "comic",
+                    detail: {
+                        fullDescription: "",
+                        gallery: [
+                            "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/m-series/1.jpg",
+                        ]
+                    }
+                },
+                                 { 
+                    id: "comic_11",
+                    title: "GLINT 闪光", 
+                    description: "",
+                    img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/glint-series/%E4%B8%BB%E9%A1%B5-11%E9%97%AA%E5%85%89.png",
+                    category: "comic",
+                    detail: {
+                        fullDescription: "",
+                        gallery: [
+                            "https://raw.githubusercontent.com/planp-studio/my-pictures/main/comics/glint-series/1.jpg",
+                        
+    
+                        ]
+                    }
+                },
+
+        ],
+        exhibition: [
+            { 
+                id: "exh_1",
+                title: "杭州艺术书展", 
+                description: "2024，展位B08",
+                img: "https://picsum.photos/id/22/800/600",
+                category: "exhibition",
+                detail: {
+                    fullDescription: "",
+                    gallery: [
+                        "https://picsum.photos/id/22/1200/900",
+                        "https://picsum.photos/id/18/1200/900",
+                        "https://picsum.photos/id/96/1200/900"
+                    ]
+                }
+            }
+        ],
+        brand: [
+            { 
+                id: "brand_1",
+                title: "单向空间·文学季", 
+                description: "主视觉插画及衍生品",
+                img: "https://picsum.photos/id/26/800/600",
+                category: "brand",
+                detail: {
+                    fullDescription: "",
+                    gallery: [
+                        "https://picsum.photos/id/26/1200/900",
+                        "https://picsum.photos/id/29/1200/900",
+                        "https://picsum.photos/id/36/1200/900"
+                    ]
+                }
+            }
+        ],
+        merch: [
+            { 
+                id: "merch_1",
+                title: "躺着织唛挂件", 
+                description: "原创插画设计",
+                img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/merch/phone-series/%E4%B8%BB%E9%A1%B5-%E5%91%A8%E8%BE%B91.png",
+                category: "merch",
+                bgColor: "#f5f0e8",
+                detail: {
+                    fullDescription: "Phone系列手机壳，原创插画设计。",
+                    gallery: [
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/merch/phone-series/1.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/merch/phone-series/2.jpg"
+                    ]
+                }
+            },
+            { 
+                id: "merch_2",
+                title: "小鸟香插", 
+                description: "小鸟主题",
+                img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/merch/bird-series/%E4%B8%BB%E9%A1%B5-%E5%91%A8%E8%BE%B92.png",
+                category: "merch",
+                bgColor: "#e0f0f5",
+                detail: {
+                    fullDescription: "《下午茶》漫画周边",
+                    gallery: [
+
+                    ]
+                }
+            },
+            { 
+                id: "merch_3",
+                title: "《夏天》系列装饰画", 
+                description: "艺术微喷",
+                img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/merch/wall%20art-series/%E4%B8%BB%E9%A1%B5-%E5%91%A8%E8%BE%B93.png",
+                category: "merch",
+                bgColor: "#f0f0f0",
+                detail: {
+                    fullDescription: "艺术微喷，适合家居装饰。",
+                    gallery: [
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/merch/wall%20art-series/1.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/merch/wall%20art-series/2.jpg"
+                    ]
+                }
+            },
+            { 
+                id: "merch_4",
+                title: "财运滚滚贴纸", 
+                description: "",
+                img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/merch/sticker-series/%E4%B8%BB%E9%A1%B5-%E5%91%A8%E8%BE%B94.png",
+                category: "merch",
+                bgColor: "#fff8f0",
+                detail: {
+                    fullDescription: "Sticker系列和纸贴纸，适合手帐装饰。",
+                    gallery: [
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/merch/sticker-series/1.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/merch/sticker-series/2.jpg"
+                    ]
+                }
+            },
+            { 
+                id: "merch_5",
+                title: "花朵钥匙扣", 
+                description: "亚克力材质",
+                img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/merch/keychain-series/%E4%B8%BB%E9%A1%B5-%E5%91%A8%E8%BE%B95.png",
+                category: "merch",
+                bgColor: "#f0e8f5",
+                detail: {
+                    fullDescription: "Keychain系列亚克力钥匙扣，可爱又实用。",
+                    gallery: [
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/merch/keychain-series/1.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/merch/keychain-series/2.jpg"
+                    ]
+                }
+            },
+            { 
+                id: "merch_6",
+                title: "表情马克杯", 
+                description: "陶瓷杯",
+                img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/merch/cup-series/%E4%B8%BB%E9%A1%B5-%E5%91%A8%E8%BE%B96.png",
+                category: "merch",
+                bgColor: "#e8e8e8",
+                detail: {
+                    fullDescription: "Cup系列陶瓷马克杯，原创插画设计。",
+                    gallery: [
+             
+                    ]
+                }
+            },
+            { 
+                id: "merch_7",
+                title: "PVC防水贴纸", 
+                description: "可爱周边",
+                img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/merch/pigu-series/%E4%B8%BB%E9%A1%B5-%E5%91%A8%E8%BE%B97.png",
+                category: "merch",
+                bgColor: "#ffe8e8",
+                detail: {
+                    fullDescription: "Pigu系列可爱周边，萌趣造型。",
+                    gallery: [
+             
+                    ]
+                }
+            },
+            { 
+                id: "merch_8",
+                title: "毛毛虫毯子", 
+                description: "",
+                img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/merch/blanket-series/%E4%B8%BB%E9%A1%B5-%E5%91%A8%E8%BE%B98.png",
+                category: "merch",
+                bgColor: "#f0f5f0",
+                detail: {
+                    fullDescription: "Blanker系列柔软毛毯，居家必备。",
+                    gallery: [
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/merch/blanker-series/1.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/merch/blanker-series/2.jpg"
+                    ]
+                }
+            }
+        ],
+        ceramic: [
+            { 
+                id: "cer_1",
+                title: "P系列 香插", 
+                description: "手捏陶，釉下彩",
+                img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/ceramics/p-series/%E4%B8%BB%E9%A1%B5-%E9%99%B6%E7%93%B71.png",
+                category: "ceramic",
+                bgColor: "#f5f5f5",
+                detail: {
+                    fullDescription: "P系列香插，手捏陶艺作品。釉下彩装饰，简约而富有禅意。",
+                    gallery: [
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/ceramics/p-series/1.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/ceramics/p-series/2.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/ceramics/p-series/3.jpg"
+                    ]
+                }
+            },
+            { 
+                id: "cer_2",
+                title: "嘻嘻", 
+                description: "手捏陶，彩绘",
+                img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/ceramics/joker-series/%E4%B8%BB%E9%A1%B5-%E9%99%B6%E7%93%B7%202.png",
+                category: "ceramic",
+                bgColor: "#f0e6d2",
+                detail: {
+                    fullDescription: "Joker系列陶艺作品，夸张的表情和色彩，充满戏剧性。",
+                    gallery: [
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/ceramics/joker-series/1.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/ceramics/joker-series/2.jpg"
+                    ]
+                }
+            },
+            { 
+                id: "cer_3",
+                title: "Peace and love", 
+                description: "手捏陶，自然釉",
+                img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/ceramics/peace-series/%E4%B8%BB%E9%A1%B5-%E9%99%B6%E7%93%B7%203.png",
+                category: "ceramic",
+                bgColor: "#e8f4e8",
+                detail: {
+                    fullDescription: "Peace系列，以和平鸽为主题的手捏陶艺作品。",
+                    gallery: [
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/ceramics/peace-series/1.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/ceramics/peace-series/2.jpg"
+                    ]
+                }
+            },
+            { 
+                id: "cer_4",
+                title: "小鸟和大象", 
+                description: "手捏陶，釉下彩",
+                img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/ceramics/bird-series/%E4%B8%BB%E9%A1%B5-%E9%99%B6%E7%93%B7%204.png",
+                category: "ceramic",
+                bgColor: "#e0f0f5",
+                detail: {
+                    fullDescription: "Bird系列小鸟陶艺，灵动可爱的手捏作品。",
+                    gallery: [
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/ceramics/bird-series/1.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/ceramics/bird-series/2.jpg"
+                    ]
+                }
+            },
+            { 
+                id: "cer_5",
+                title: "躺躺喝奶茶", 
+                description: "手捏陶，彩绘",
+                img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/ceramics/lying-series/%E4%B8%BB%E9%A1%B5-%E9%99%B6%E7%93%B7%205.png",
+                category: "ceramic",
+                bgColor: "#f5ede0",
+                detail: {
+                    fullDescription: "Laying系列，躺着的小人陶艺，慵懒惬意。",
+                    gallery: [
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/ceramics/laying-series/1.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/ceramics/laying-series/2.jpg"
+                    ]
+                }
+            },
+            { 
+                id: "cer_6",
+                title: "发发呆", 
+                description: "手捏陶，青釉",
+                img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/ceramics/grass-series/%E4%B8%BB%E9%A1%B5-%E9%99%B6%E7%93%B7%206.png",
+                category: "ceramic",
+                bgColor: "#e8f0e0",
+                detail: {
+                    fullDescription: "Grass系列草叶纹陶器，自然灵感的手捏作品。",
+                    gallery: [
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/ceramics/grass-series/1.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/ceramics/grass-series/2.jpg"
+                    ]
+                }
+            },
+            { 
+                id: "cer_7",
+                title: "飞鸟灯", 
+                description: "手捏陶灯",
+                img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/ceramics/lamp-series/%E4%B8%BB%E9%A1%B5-%E9%99%B6%E7%93%B7%207.png",
+                category: "ceramic",
+                bgColor: "#f0e8d8",
+                detail: {
+                    fullDescription: "Lamp系列陶艺灯，温暖的光透过陶壁。",
+                    gallery: [
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/ceramics/lamp-series/1.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/ceramics/lamp-series/2.jpg"
+                    ]
+                }
+            },
+            { 
+                id: "cer_8",
+                title: "《下午茶》漫画盘子", 
+                description: "手捏陶盘",
+                img: "https://raw.githubusercontent.com/planp-studio/my-pictures/main/ceramics/plate-series/%E4%B8%BB%E9%A1%B5-%E9%99%B6%E7%93%B7.png",
+                category: "ceramic",
+                bgColor: "#f5f0e8",
+                detail: {
+                    fullDescription: "Plate系列手捏陶盘，每一只都是独特的形状。",
+                    gallery: [
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/ceramics/plate-series/1.jpg",
+                        "https://raw.githubusercontent.com/planp-studio/my-pictures/main/ceramics/plate-series/2.jpg"
+                    ]
+                }
+            }
+        ],
+        other: [
+            { 
+                id: "other_1",
+                title: "实验动画", 
+                description: "短片《呼吸》",
+                img: "https://picsum.photos/id/3/800/600",
+                category: "other",
+                detail: {
+                    fullDescription: "",
+                    gallery: [
+                        "https://picsum.photos/id/3/1200/900",
+                        "https://picsum.photos/id/10/1200/900",
+                        "https://picsum.photos/id/80/1200/900"
+                    ]
+                }
+            }
+        ]
+    };
+
+    let currentCategory = 'illustration';
+    const workPage = document.getElementById('workPage');
+    const aboutPage = document.getElementById('aboutPage');
+    let allWorksArray = [];
+
+    function buildAllWorksArray() {
+        allWorksArray = [];
+        for (const [category, works] of Object.entries(worksData)) {
+            works.forEach(work => {
+                allWorksArray.push({
+                    ...work,
+                    categoryName: getCategoryName(category)
+                });
+            });
+        }
+    }
+    function getCategoryName(cat) {
+        const names = { illustration: '插画', comic: '漫画', exhibition: '展览', brand: '品牌合作', merch: '周边', ceramic: '手作', other: '其它' };
+        return names[cat] || cat;
+    }
+
+    function showPage(pageName) {
+        if (pageName === 'work') {
+            workPage.classList.remove('page-hidden');
+            aboutPage.classList.add('page-hidden');
+            if (document.getElementById('workContainer').innerHTML === '') renderWorks(currentCategory);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else if (pageName === 'about') {
+            workPage.classList.add('page-hidden');
+            aboutPage.classList.remove('page-hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
+
+    function renderWorks(category) {
+        const container = document.getElementById('workContainer');
+        const works = worksData[category];
+        if (!works || !works.length) {
+            container.innerHTML = '<div class="empty-message">✨ 暂无作品，敬请期待 ✨</div>';
+            return;
+        }
+        container.innerHTML = `<div class="work-grid fade-in">${works.map(w => `
+            <div class="work-card" data-id="${w.id}" data-category="${category}">
+                <img src="${w.img}" alt="${w.title}" loading="lazy" onerror="this.src='https://placehold.co/600x450?text=PLAN.P'">
+                <h3>${escapeHtml(w.title)}</h3>
+                <p>${escapeHtml(w.description)}</p>
+            </div>`).join('')}</div>`;
+        
+        document.querySelectorAll('.work-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const id = card.dataset.id;
+                const category = card.dataset.category;
+                const work = worksData[category].find(w => w.id === id);
+                if (work) openDetailModal(work);
+            });
+        });
+    }
+    
+    // 详情弹窗 - 与搜索框样式一致
+function openDetailModal(work) {
+    const modal = document.getElementById('detailModal');
+    const content = document.getElementById('detailModalContent');
+    const detail = work.detail;
+    const images = detail.gallery || [work.img];
+    
+    // 获取背景色，如果没有设置则默认为白色
+    const bgColor = work.bgColor || '#ffffff';
+    
+    // 根据背景色自动调整文字颜色（深色背景用白字，浅色背景用黑字）
+    const isDarkBg = bgColor === '#1a1a1a' || bgColor === '#000000' || bgColor === '#2c2c2c';
+    const textColor = isDarkBg ? '#ffffff' : '#333333';
+    const titleColor = isDarkBg ? '#ffffff' : '#000000';
+    
+    let galleryHtml = '';
+    if (images && images.length > 0) {
+        galleryHtml = `<div class="detail-gallery">
+            ${images.map(url => `
+                <img src="${url}" alt="${work.title}" loading="lazy" onerror="this.src='https://placehold.co/1200x900?text=Image'">
+            `).join('')}
+        </div>`;
+    }
+    
+    const fullHtml = `
+        <h1 class="detail-title" style="color: ${titleColor};">${escapeHtml(work.title)}</h1>
+        <div class="detail-description" style="color: ${textColor};">
+            ${detail.fullDescription ? detail.fullDescription.replace(/\n/g, '<br>') : ''}
+        </div>
+        ${galleryHtml}
+    `;
+    
+    content.innerHTML = fullHtml;
+    
+    // 设置背景色
+    content.style.backgroundColor = bgColor;
+    
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+    
+    function closeDetailModal() {
+        const modal = document.getElementById('detailModal');
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    function escapeHtml(str) { 
+        if (!str) return '';
+        return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); 
+    }
+
+    function performSearch(keyword) {
+        if (!keyword.trim()) {
+            document.getElementById('searchResults').innerHTML = '<div style="padding:20px;text-align:center;color:#888;">输入关键词搜索作品...</div>';
+            return;
+        }
+        const results = allWorksArray.filter(item => 
+            item.title.toLowerCase().includes(keyword.toLowerCase()) || 
+            item.description.toLowerCase().includes(keyword.toLowerCase())
+        );
+        if (results.length === 0) {
+            document.getElementById('searchResults').innerHTML = '<div style="padding:20px;text-align:center;color:#888;">未找到相关作品</div>';
+            return;
+        }
+        document.getElementById('searchResults').innerHTML = results.map(r => `
+            <div class="search-result-item" data-id="${r.id}" data-category="${r.category}">
+                <div style="display:flex; gap:12px; align-items:center;">
+                    <img src="${r.img}" style="width:50px; height:50px; object-fit:cover; border-radius:4px;" onerror="this.src='https://placehold.co/50x50'">
+                    <div>
+                        <strong>${escapeHtml(r.title)}</strong>
+                        <div style="font-size:0.75rem; color:#888;">${escapeHtml(r.description)}</div>
+                        <div style="font-size:0.7rem; color:#aaa; margin-top:4px;">${r.categoryName}</div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+        
+        document.querySelectorAll('.search-result-item').forEach(el => {
+            el.addEventListener('click', () => {
+                const id = el.dataset.id;
+                const category = el.dataset.category;
+                const work = worksData[category].find(w => w.id === id);
+                if (work) {
+                    showPage('work');
+                    openDetailModal(work);
+                    document.getElementById('searchModal').classList.remove('active');
+                }
+            });
+        });
+    }
+
+    function initSearch() {
+        const searchBtn = document.getElementById('searchIconBtn');
+        const modal = document.getElementById('searchModal');
+        const closeBtn = document.getElementById('closeSearchBtn');
+        const searchInput = document.getElementById('searchInput');
+        
+        searchBtn.addEventListener('click', () => {
+            modal.classList.add('active');
+            searchInput.focus();
+            performSearch('');
+        });
+        closeBtn.addEventListener('click', () => modal.classList.remove('active'));
+        modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('active'); });
+        
+        let debounceTimer;
+        searchInput.addEventListener('input', (e) => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => performSearch(e.target.value), 300);
+        });
+    }
+
+    function init() {
+        buildAllWorksArray();
+        
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (!workPage.classList.contains('page-hidden')) {
+                    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentCategory = btn.dataset.category;
+                    renderWorks(currentCategory);
+                }
+            });
+        });
+        
+        document.querySelector('[data-nav="work"]').addEventListener('click', () => showPage('work'));
+        document.querySelector('[data-nav="about"]').addEventListener('click', () => showPage('about'));
+        document.querySelector('[data-nav="contact"]').addEventListener('click', () => { 
+            showPage('work'); 
+            setTimeout(() => document.querySelector('.contact')?.scrollIntoView({ behavior: 'smooth' }), 100); 
+        });
+        
+        document.getElementById('closeDetailBtn').addEventListener('click', closeDetailModal);
+        document.getElementById('detailModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('detailModal')) closeDetailModal();
+        });
+        
+        renderWorks(currentCategory);
+        initSearch();
+        
+        document.querySelector('.avatar')?.addEventListener('error', function() { this.src = 'https://placehold.co/300x300?text=PLAN.P'; });
+    }
+    init();
+</script>
+</body>
+</html>
