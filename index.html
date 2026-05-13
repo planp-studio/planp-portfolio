@@ -346,79 +346,6 @@
             .close-btn { top: 20px; right: 20px; width: 36px; height: 36px; font-size: 1.2rem; }
         }
     </style>
-    <!-- 在 </head> 之前添加 -->
-<script>
-    (function() {
-        // ========== 1. 禁止右键保存 ==========
-        document.addEventListener('contextmenu', function(e) {
-            if (e.target.tagName === 'IMG') {
-                e.preventDefault();
-                return false;
-            }
-        });
-        
-        // 禁止拖拽
-        document.querySelectorAll('img').forEach(img => {
-            img.setAttribute('draggable', 'false');
-            img.addEventListener('dragstart', (e) => e.preventDefault());
-        });
-        
-        // 禁止保存快捷键
-        document.addEventListener('keydown', function(e) {
-            if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S')) {
-                e.preventDefault();
-                alert('图片保存功能已禁用');
-            }
-        });
-        
-        // ========== 2. 添加Canvas水印 ==========
-        function addWatermark() {
-            const images = document.querySelectorAll('.work-card img, .detail-gallery img');
-            
-            images.forEach(img => {
-                if (img.hasAttribute('data-watermarked')) return;
-                
-                const originalSrc = img.src;
-                if (!originalSrc || originalSrc.startsWith('data:')) return;
-                
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                const tempImg = new Image();
-                
-                tempImg.crossOrigin = 'Anonymous';
-                tempImg.onload = function() {
-                    canvas.width = tempImg.width;
-                    canvas.height = tempImg.height;
-                    ctx.drawImage(tempImg, 0, 0);
-                    
-                    // 水印文字
-                    const fontSize = Math.max(14, Math.floor(tempImg.width / 25));
-                    ctx.font = `${fontSize}px "PingFang SC", "Microsoft YaHei"`;
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-                    ctx.shadowBlur = 3;
-                    ctx.shadowColor = 'rgba(0,0,0,0.5)';
-                    
-                    const text = '© PLAN.P STUDIO';
-                    const metrics = ctx.measureText(text);
-                    const x = tempImg.width - metrics.width - 15;
-                    const y = tempImg.height - 15;
-                    
-                    ctx.fillText(text, x, y);
-                    img.src = canvas.toDataURL('image/jpeg', 0.85);
-                    img.setAttribute('data-watermarked', 'true');
-                };
-                tempImg.src = originalSrc;
-            });
-        }
-        
-        // 监听图片加载完成
-        window.addEventListener('load', () => setTimeout(addWatermark, 500));
-        
-        // 监听详情弹窗打开
-        const observer = new MutationObserver(() => setTimeout(addWatermark, 200));
-        observer.observe(document.body, { childList: true, subtree: true });
-    })();
-</script>
 </head>
 <body>
 
@@ -1523,7 +1450,101 @@ function openDetailModal(work) {
         
         document.querySelector('.avatar')?.addEventListener('error', function() { this.src = 'https://placehold.co/300x300?text=PLAN.P'; });
     }
-    init();
+     init();
 </script>
+
+<!-- 保护代码：增强版 -->
+<script>
+(function() {
+    // 等待页面完全加载
+    window.addEventListener('load', function() {
+        // ========== 1. 禁用右键（针对所有图片） ==========
+        document.addEventListener('contextmenu', function(e) {
+            if (e.target.tagName === 'IMG') {
+                e.preventDefault();
+                alert('⚠️ 图片受版权保护，请勿保存！');
+                return false;
+            }
+        });
+        
+        // ========== 2. 禁用拖拽 ==========
+        const allImages = document.querySelectorAll('img');
+        allImages.forEach(img => {
+            img.setAttribute('draggable', 'false');
+            img.addEventListener('dragstart', function(e) {
+                e.preventDefault();
+                return false;
+            });
+        });
+        
+        // ========== 3. 禁用保存快捷键 ==========
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S')) {
+                e.preventDefault();
+                alert('⚠️ 快捷键保存已禁用');
+                return false;
+            }
+        });
+        
+        // ========== 4. 对新加载的图片也应用保护 ==========
+        const observer = new MutationObserver(function() {
+            document.querySelectorAll('img:not([data-protected])').forEach(img => {
+                img.setAttribute('draggable', 'false');
+                img.setAttribute('data-protected', 'true');
+                img.addEventListener('dragstart', function(e) {
+                    e.preventDefault();
+                    return false;
+                });
+            });
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+        
+        console.log('✅ 图片保护已生效');
+    });
+    
+    // ========== 5. 隐形水印（下载后可见） ==========
+    const watermarkStyle = document.createElement('style');
+    watermarkStyle.textContent = `
+        .work-card {
+            position: relative;
+            overflow: hidden;
+        }
+        .work-card::after {
+            content: '© PLAN.P STUDIO';
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            font-size: 13px;
+            font-family: "PingFang SC", "Microsoft YaHei", monospace;
+            color: rgba(0,0,0,0.08);
+            background: transparent;
+            pointer-events: none;
+            z-index: 10;
+            font-weight: normal;
+        }
+        .detail-gallery .gallery-item {
+            position: relative;
+        }
+        .detail-gallery .gallery-item::after {
+            content: '© PLAN.P STUDIO';
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            font-size: 14px;
+            font-family: "PingFang SC", "Microsoft YaHei", monospace;
+            color: rgba(0,0,0,0.08);
+            background: transparent;
+            pointer-events: none;
+            z-index: 10;
+        }
+        /* 确保头像也有保护 */
+        .avatar {
+            position: relative;
+        }
+    `;
+    document.head.appendChild(watermarkStyle);
+})();
+</script>
+
 </body>
 </html>
